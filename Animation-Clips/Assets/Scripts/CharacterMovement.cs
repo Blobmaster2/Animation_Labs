@@ -54,34 +54,28 @@ public class CharacterMovement : MonoBehaviour
         {
             StartCoroutine(Jump());
         }
+    
+        Vector2 moveDir = moveAction.ReadValue<Vector2>();
+        float yaw = moveDir.x;
+        Vector3 rotation = transform.eulerAngles;
+        rotation.y += yaw;
+        transform.eulerAngles = rotation;
 
         bool sprint = sprintAction.IsPressed();
+        bool movement = Mathf.Abs(moveDir.y) > Mathf.Epsilon;
 
-        Vector2 moveDir = moveAction.ReadValue<Vector2>();
-        Vector3 moveDirection = new Vector3(moveDir.x, 0, moveDir.y).normalized;
+        body.velocity = transform.rotation * Vector3.forward * moveDir.y * (sprint ? sprintSpeed : moveSpeed);
 
-        if (moveDirection != Vector3.zero)
+        if (movement)
         {
-            if (sprint)
-            {
-                animationManager.Change(Animations.RUN);
-                speed = sprintSpeed;
-            }
-            else
-            {
-                animationManager.Change(Animations.WALK);
-                speed = moveSpeed;
-            }
-            transform.forward = moveDirection;
+            if (sprint) animationManager.Change(Animations.RUN);
+
+            else animationManager.Change(Animations.WALK);
         }
         else
         {
             animationManager.Change(Animations.IDLE);
         }
-
-        float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-        body.velocity = moveDirection * speed;
     }
 
     IEnumerator Jump()
