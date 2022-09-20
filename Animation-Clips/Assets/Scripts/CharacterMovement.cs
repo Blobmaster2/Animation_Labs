@@ -14,7 +14,15 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] float jumpDuration = 0.5f;
 
     Rigidbody body;
-    Animator animator;
+    AnimationController animationManager;
+
+    public enum Animations
+    {
+        WALK,
+        RUN,
+        JUMP,
+        IDLE
+    }
 
     float speed;
 
@@ -36,7 +44,7 @@ public class CharacterMovement : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+        animationManager = GetComponent<AnimationController>();
     }
 
     // Update is called once per frame
@@ -47,42 +55,38 @@ public class CharacterMovement : MonoBehaviour
             StartCoroutine(Jump());
         }
 
-        if (sprintAction.IsPressed())
-        {
-            speed = sprintSpeed;
-            animator.SetBool("Run", true);
-        }
-        else
-        {
-            animator.SetBool("Run", false);
-            speed = moveSpeed;
-        }
-
-        
+        bool sprint = sprintAction.IsPressed();
 
         Vector2 moveDir = moveAction.ReadValue<Vector2>();
         Vector3 moveDirection = new Vector3(moveDir.x, 0, moveDir.y).normalized;
 
         if (moveDirection != Vector3.zero)
         {
+            if (sprint)
+            {
+                animationManager.Change(Animations.RUN);
+                speed = sprintSpeed;
+            }
+            else
+            {
+                animationManager.Change(Animations.WALK);
+                speed = moveSpeed;
+            }
             transform.forward = moveDirection;
-            animator.SetBool("Walk", true);
         }
         else
         {
-            animator.SetBool("Walk", false);
+            animationManager.Change(Animations.IDLE);
         }
 
         float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
-
         transform.rotation = Quaternion.Euler(0f, targetAngle, 0f);
-
         body.velocity = moveDirection * speed;
     }
 
     IEnumerator Jump()
     {
-        animator.SetBool("Jump", true);
+        animationManager.Change(Animations.JUMP);
 
         float elaspedTime = 0;
 
@@ -107,8 +111,6 @@ public class CharacterMovement : MonoBehaviour
         }
 
         body.velocity = Vector3.zero;
-
-        animator.SetBool("Jump", false);
 
         yield return null;
     }
