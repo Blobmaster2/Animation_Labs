@@ -9,12 +9,10 @@ public class LerpScript : MonoBehaviour
     Material mat;
     float t;
 
-    int currentPoint = 0;
-    int nextPoint = 1;
-
     public List<Transform> points;
 
     public float speed;
+    bool descendTime = false;
 
     Color lerpColour;
 
@@ -28,27 +26,24 @@ public class LerpScript : MonoBehaviour
         lerpColour = Color.Lerp(Color.white, Color.red, slider.value);
         mat.color = lerpColour;
 
-        t += Time.smoothDeltaTime / speed;
+        t += !descendTime ? Time.smoothDeltaTime / speed : -Time.smoothDeltaTime / speed;
 
-        transform.position = Vector3.Lerp(points[currentPoint].position, points[nextPoint].position, t);
+        if (t > 1.0f) descendTime = true;
+        if (t < 0.0f) descendTime = false;
 
-        if (t > 1)
-        {
-            t = 0;
+        transform.position = BezierFunc();
+    }
 
-            nextPoint++;
-            currentPoint++;
+    Vector3 BezierFunc()
+    {
+        Vector3 a = Vector3.Lerp(points[0].position, points[1].position, t);
+        Vector3 b = Vector3.Lerp(points[1].position, points[2].position, t);
+        Vector3 c = Vector3.Lerp(points[2].position, points[3].position, t);
 
-            if (nextPoint > points.Count - 1)
-            {
-                nextPoint = 0;
-            }
-            if (currentPoint > points.Count - 1)
-            {
-                currentPoint = 0;
-            }
-        }
+        Vector3 ab = Vector3.Lerp(a, b, t);
+        Vector3 bc = Vector3.Lerp(b, c, t);
 
-        transform.Rotate(Vector3.one / 100);
+        Vector3 returnVec = Vector3.Lerp(ab, bc, t);
+        return returnVec;
     }
 }
