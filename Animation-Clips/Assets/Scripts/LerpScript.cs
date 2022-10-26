@@ -8,30 +8,60 @@ public class LerpScript : MonoBehaviour
     public Slider slider;
     Material mat;
     float t;
+    int pointsListPos = 0;
+    Vector3 lookAheadVec;
+    float distanceToNext;
+    float move;
 
     public List<Transform> points;
 
     public float speed;
-    bool descendTime = false;
 
     Color lerpColour;
 
     // Start is called before the first frame update
     void Start()
     {
+        lookAheadVec = points[1].position;
+        distanceToNext = Vector3.Distance(points[pointsListPos].position, lookAheadVec);
         mat = GetComponent<MeshRenderer>().material;
     }
+
     private void Update()
     {
         lerpColour = Color.Lerp(Color.white, Color.red, slider.value);
         mat.color = lerpColour;
 
-        t += !descendTime ? Time.smoothDeltaTime / speed : -Time.smoothDeltaTime / speed;
+        t += Time.smoothDeltaTime * speed;
 
-        if (t > 1.0f) descendTime = true;
-        if (t < 0.0f) descendTime = false;
+        move = t / distanceToNext;
 
-        transform.position = BezierFunc();
+
+        if (t > distanceToNext)
+        {
+            t = 0.0f;
+            pointsListPos++;
+
+            if (pointsListPos > points.Count - 1)
+            {
+                pointsListPos = 0;
+            }
+
+            if (pointsListPos + 1 > points.Count - 1)
+            {
+                lookAheadVec = points[0].position;
+            }
+            else
+            {
+                lookAheadVec = points[pointsListPos + 1].position;
+            }
+            distanceToNext = Vector3.Distance(points[pointsListPos].position, lookAheadVec);
+
+        }
+
+        Debug.Log(move);
+
+        transform.position = CatmullRomFunc(move, points[ClampListPos(pointsListPos - 1)].position, points[pointsListPos].position, points[ClampListPos(pointsListPos + 1)].position, points[ClampListPos(pointsListPos + 2)].position);
     }
 
     Vector3 BezierFunc()
@@ -45,5 +75,32 @@ public class LerpScript : MonoBehaviour
 
         Vector3 returnVec = Vector3.Lerp(ab, bc, t);
         return returnVec;
+    }
+
+    Vector3 CatmullRomFunc(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+    {
+        Vector3 a = 2f * p1;
+        Vector3 b = p2 - p0;
+        Vector3 c = 2f * p0 - 5f * p1 + 4f * p2 - p3;
+        Vector3 d = -p0 + 3f * p1 - 3f * p2 + p3;
+        return 0.5f * (a + (b * t) + (c * t * t) + (d * t * t * t));
+    }
+
+    int ClampListPos(int pos)
+    {
+        if (pos < 0)
+        {
+            pos = points.Count - 1;
+        }
+        if (pos > points.Count)
+        {
+            pos = 1;
+        }
+        else if (pos > points.Count - 1)
+        {
+            pos = 0;
+        }
+
+        return pos;
     }
 }
