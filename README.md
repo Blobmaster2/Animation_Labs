@@ -4,3 +4,4 @@ Lab 3 - https://youtu.be/pBaJIICOtr0
 Lab 4 - https://youtu.be/jKejogFmqko
 Lab 5 - https://youtu.be/Y2fP1tiS7Q8
 Lab 6 - https://youtu.be/rnxY8G7_hvk
+Lab 7 - https://youtu.be/sH1eS7N0K0U
