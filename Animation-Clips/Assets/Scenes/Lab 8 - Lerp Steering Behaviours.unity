@@ -152,7 +152,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &142272051
 GameObject:
@@ -581,11 +581,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 142272055}
   speed: 5
-  arriveSlowdownThreshold: 5
+  arriveSlowdownThreshold: 10
   pursuitGameUpdates: 1
-  customProximity: 5
+  customProximity: 20
   wanderTargetPos: {fileID: 91811890}
-  behaviours: 4
+  behaviours: 0
   customBehaviours: 0
   useCustomBehaviour: 1
 --- !u!23 &2104361621
@@ -651,7 +651,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2104361624
 BoxCollider:
