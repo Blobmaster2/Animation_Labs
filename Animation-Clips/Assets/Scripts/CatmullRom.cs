@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class CatmullRom : MonoBehaviour
 {
+    Rigidbody rb;
     public Transform[] points;
     public float speed = 1.0f;
     [Range(1, 32)]
     public int sampleRate = 16;
+    bool updatedVelocity;
 
     [System.Serializable]
     class SamplePoint
@@ -32,6 +34,7 @@ public class CatmullRom : MonoBehaviour
 
     private void Start()
     {
+        rb = GetComponent<Rigidbody>();
         //make sure there are 4 points, else disable the component
         if (points.Length < 4)
         {
@@ -72,6 +75,8 @@ public class CatmullRom : MonoBehaviour
 
     private void Update()
     {
+        Vector3 currentPos = transform.position;
+
         int size = points.Length;
 
         distance += speed * Time.smoothDeltaTime;
@@ -93,6 +98,7 @@ public class CatmullRom : MonoBehaviour
                 distance = 0;
             }
 
+            updatedVelocity = false;
             currentSample++;
         }
 
@@ -101,7 +107,12 @@ public class CatmullRom : MonoBehaviour
         Vector3 p2 = points[(currentIndex + 1) % points.Length].position;
         Vector3 p3 = points[(currentIndex + 2) % points.Length].position;
 
-        transform.position = CatmullRomFunc(p0, p1, p2, p3, GetAdjustedT());
+        if (!updatedVelocity)
+        {
+            rb.velocity = (CatmullRomFunc(p0, p1, p2, p3, GetAdjustedT()) - currentPos) * speed;
+            updatedVelocity = true;
+        }
+
     }
 
     float GetAdjustedT()

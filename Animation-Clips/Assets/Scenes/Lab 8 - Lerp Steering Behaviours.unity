@@ -585,9 +585,9 @@ MonoBehaviour:
   pursuitGameUpdates: 1
   customProximity: 5
   wanderTargetPos: {fileID: 91811890}
-  behaviours: 0
+  behaviours: 4
   customBehaviours: 0
-  useCustomBehaviour: 0
+  useCustomBehaviour: 1
 --- !u!23 &2104361621
 MeshRenderer:
   m_ObjectHideFlags: 0
